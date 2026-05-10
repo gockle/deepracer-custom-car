@@ -198,6 +198,7 @@ for pkg in $PACKAGES; do
                             ros-$ROS_DISTRO-rplidar-ros, \
                             ros-$ROS_DISTRO-camera-info-manager, \
                             ros-$ROS_DISTRO-libcamera, \
+                            ros-$ROS_DISTRO-camera-ros, \
                             ros-$ROS_DISTRO-web-video-server, \
                             ros-$ROS_DISTRO-rosbag2, \
                             ros-$ROS_DISTRO-rosbag2-py, \
@@ -206,7 +207,7 @@ for pkg in $PACKAGES; do
         if [ "$ROS_DISTRO" == "jazzy" ]; then
             PACKAGE_DEPS="$PACKAGE_DEPS, ros-$ROS_DISTRO-image-view"
             if [ $TARGET_ARCH == "arm64" ]; then
-                PACKAGE_DEPS="$PACKAGE_DEPS, ros-$ROS_DISTRO-libcamera (>= 1:0.5.0+drpi)"
+                PACKAGE_DEPS="$PACKAGE_DEPS, ros-$ROS_DISTRO-libcamera (>= 1:0.7.1+drpi)"
             else
                 PACKAGE_DEPS="$PACKAGE_DEPS, ros-$ROS_DISTRO-libcamera"
             fi
