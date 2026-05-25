@@ -1,7 +1,7 @@
 #!/bin/bash
 VER="V1.1"
-IMAGE="dlrc_image_noble_20251123.1_tpm.img"
-IMAGE_MD5="dlrc_image_noble_20251123.1_tpm.md5"
+IMAGE="dlrc_image_noble_20260524.1.img"
+IMAGE_MD5="dlrc_image_noble_20260524.1.md5"
 
 #Default encrypt setting
 Disk_PASS="pega#1234"
@@ -10,7 +10,7 @@ OTG_LABEL_NAME="DEEPRACER"
 #OTG_LABEL_NAME="DEEPLENS"
 
 CHECK_MD5=1
-SEAL_TPM=1
+SEAL_TPM=0
 FSCK_MMCBLK=1
 OTG_ENABLE=0
 RESIZE=1
@@ -301,10 +301,12 @@ ResizePartition(){
     sudo mlabel -i ${EMMC_OTG_PATH} ::$OTG_LABEL_NAME
   
   else
-    #Resize root partition 
-    sudo partprobe ${EMMC_PATH}
+    #Resize root partition
     sudo parted ${EMMC_PATH} resizepart ${ROOT_PARTITION_NUMBER} ${MMC_TOTLE_SIZE}
-    sudo e2fsck -fy ${EMMC_ROOT_PATH}
+    sudo partprobe ${EMMC_PATH}        # notify kernel AFTER resize
+    sudo udevadm settle                # wait for kernel/udev to finish
+    sudo e2fsck -fy ${EMMC_ROOT_PATH}  # pass 1: replay journal, fix state (may exit 1)
+    sudo e2fsck -fy ${EMMC_ROOT_PATH}  # pass 2: confirm clean before resize2fs
     sudo resize2fs ${EMMC_ROOT_PATH}
 
   fi   
@@ -520,7 +522,7 @@ for mtabline in `cat /etc/mtab`; do
                   
                   echo $(date -u) "Reboot system now..."
                   sleep 2
-                  #reboot
+                  reboot
                 else
                     echo $(date -u) "Seal and luksChangeKey FAIL!"		
                 fi 
@@ -528,7 +530,7 @@ for mtabline in `cat /etc/mtab`; do
                 echo $(date -u) "Reboot system now..."
                 sleep 2
                 sync
-                #reboot
+                reboot
               fi       
             fi
             exit 1;
